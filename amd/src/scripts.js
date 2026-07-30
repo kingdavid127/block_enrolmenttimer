@@ -14,127 +14,148 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * @package    block_enrolmenttimer
+ * Live countdown for the enrolment timer block.
+ *
+ * Units are read from data-unit attributes holding machine names, so this works
+ * regardless of the site language.
+ *
+ * @module     block_enrolmenttimer/scripts
  * @copyright  2014 onwards LearningWorks Ltd {@link https://learningworks.co.nz/}
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright  2026 Dragonfly EdTech
  * @author     Aaron Leggett
+ * @author     David Saylor <david.saylor@dragonflyedtech.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
+/** Seconds in each unit, largest first. Must match \block_enrolmenttimer\enrolment::UNITS. */
+const UNITS = [
+    ['years', 31536000],
+    ['months', 2592000],
+    ['weeks', 604800],
+    ['days', 86400],
+    ['hours', 3600],
+    ['minutes', 60],
+    ['seconds', 1],
+];
+
+/** Seconds keyed by unit machine name. */
+const SIZES = new Map(UNITS);
 
 /**
- * @module block_enrolmenttimer/scripts
+ * Read the units this timer displays, largest first.
+ *
+ * @param {HTMLElement} timer The timer root element
+ * @returns {Array} List of unit machine names
  */
-define(['jquery'], function($) { // Moodle needs this to recognise $ https://docs.moodle.org/dev/jQuery .
-    // JQuery is available via $.
+const getDisplayedUnits = (timer) => {
+    return Array.from(timer.querySelectorAll('.timer-wrapper .timerNum'))
+        .map((node) => node.dataset.unit)
+        .filter(Boolean);
+};
 
-    return {
-        initialise: function() {
-            // Module initialised.
-            $(document).ready(function() {
-                var options = [];
-                var arrayKeys = [];
-                var timestamp = 0;
-                var forceTwoDigits = false;
-
-                function getDisplayedOptions() {
-                    var children = $('.block_enrolmenttimer .active .timer-wrapper').find('.timerNum');
-
-                    for (var i = children.length - 1; i >= 0; i--) {
-                        var arrayKey = $(children[i]).attr('data-id');
-                        arrayKeys.push(arrayKey);
-                    }
-                }
-
-                function populateWithData() {
-                    for (var i = arrayKeys.length - 1; i >= 0; i--) {
-                        var option = $('.block_enrolmenttimer .active .text-desc .' + arrayKeys[i]).text();
-                        options[arrayKeys[i]] = option;
-                    }
-                }
-
-                function makeTimestamp() {
-                    for (var i = arrayKeys.length - 1; i >= 0; i--) {
-                        switch (arrayKeys[i]) {
-                            case 'seconds':
-                                timestamp += parseInt(options[arrayKeys[i]], 10);
-                                break;
-
-                            case 'minutes':
-                                timestamp += parseInt(options[arrayKeys[i]], 10) * 60;
-                                break;
-
-                            case 'hours':
-                                timestamp += parseInt(options[arrayKeys[i]], 10) * 3600;
-                                break;
-
-                            case 'days':
-                                timestamp += parseInt(options[arrayKeys[i]], 10) * 86400;
-                                break;
-
-                            case 'weeks':
-                                timestamp += parseInt(options[arrayKeys[i]], 10) * 604800;
-                                break;
-
-                            case 'months':
-                                timestamp += parseInt(options[arrayKeys[i]], 10) * 2592000;
-                                break;
-
-                            case 'years':
-                                timestamp += parseInt(options[arrayKeys[i]], 10) * 31536000;
-                                break;
-                        }
-                    }
-                }
-
-                function updateMainCounter(counter, time) {
-                    var html = '';
-                    if (forceTwoDigits === true && time.toString().length == 1) {
-                        html += '<span class="timerNumChar" data-id="0">0</span>';
-                        html += '<span class="timerNumChar" data-id="1">' + time.toString() + '</span>';
-                    } else {
-                        for (var i = 0; i < time.toString().length; i++) {
-                            html += '<span class="timerNumChar" data-id="' + i + '">' + time.toString().charAt(i) + '</span>';
-                        }
-                    }
-
-                    $('.block_enrolmenttimer .active .timer-wrapper .timerNum[data-id="' + counter + '"]').html(html);
-                    $('.block_enrolmenttimer .active .text-desc .' + counter).html(time);
-                }
-
-                function updateLiveCounter() {
-                    timestamp--;
-                    var time = timestamp;
-                    var tokens = ['years', 'months', 'weeks', 'days', 'hours', 'minutes', 'seconds'];
-                    var units = ['31536000', '2592000', '604800', '86400', '3600', '60', '1'];
-
-                    for (var i = 0; i < tokens.length; i++) {
-
-                        if (arrayKeys.indexOf(tokens[i]) != -1) {
-                            if (time >= units[i]) {
-                                var count = Math.floor(time / units[i]);
-                                updateMainCounter(tokens[i], count);
-                                time = time - (count * units[i]);
-                            } else {
-                                updateMainCounter(tokens[i], 0);
-                            }
-                        }
-                    }
-                }
-
-                if ($('.block_enrolmenttimer .active').length > 0) {
-                    getDisplayedOptions();
-                    populateWithData();
-                    makeTimestamp();
-
-                    // Create timer.
-                    window.setInterval(function() {
-                        updateLiveCounter();
-                    }, 1000);
-                }
-
-                if ($('.block_enrolmenttimer .timer-wrapper[data-id=force2]').length > 0) {
-                    forceTwoDigits = true;
-                }
-            });
+/**
+ * Total the displayed figures back into a number of seconds.
+ *
+ * @param {HTMLElement} timer The timer root element
+ * @param {Array} units Unit machine names in play
+ * @returns {number} Seconds remaining
+ */
+const readRemaining = (timer, units) => {
+    return units.reduce((total, unit) => {
+        const node = timer.querySelector('.timer-wrapper .timerNum[data-unit="' + unit + '"]');
+        if (!node) {
+            return total;
         }
-    };
-});
+        const digits = Array.from(node.querySelectorAll('.timerNumChar'))
+            .map((span) => span.textContent.trim())
+            .join('');
+        const value = parseInt(digits, 10);
+
+        return isNaN(value) ? total : total + (value * SIZES.get(unit));
+    }, 0);
+};
+
+/**
+ * Repaint one unit.
+ *
+ * @param {HTMLElement} timer The timer root element
+ * @param {string} unit Unit machine name
+ * @param {number} count How many of this unit remain
+ * @param {boolean} forceTwoDigits Whether to pad single figures
+ */
+const paintUnit = (timer, unit, count, forceTwoDigits) => {
+    const figures = timer.querySelector('.timer-wrapper .timerNum[data-unit="' + unit + '"]');
+    const word = count === 1 ? 'labelSingular' : 'labelPlural';
+
+    if (figures) {
+        let text = String(count);
+        if (forceTwoDigits && text.length === 1) {
+            text = '0' + text;
+        }
+        figures.textContent = '';
+        Array.from(text).forEach((digit, position) => {
+            const span = document.createElement('span');
+            span.className = 'timerNumChar';
+            span.dataset.position = position;
+            span.textContent = digit;
+            figures.appendChild(span);
+        });
+
+        const label = timer.querySelector('.unit-label[data-unit="' + unit + '"]');
+        if (label) {
+            label.textContent = figures.dataset[word];
+        }
+
+        const textWord = timer.querySelector('.unit-word[data-unit="' + unit + '"]');
+        if (textWord) {
+            textWord.textContent = figures.dataset[word];
+        }
+    }
+
+    const textCount = timer.querySelector('.unit-count[data-unit="' + unit + '"]');
+    if (textCount) {
+        textCount.textContent = count;
+    }
+};
+
+/**
+ * Start one timer ticking.
+ *
+ * @param {HTMLElement} timer The timer root element
+ */
+const startTimer = (timer) => {
+    const units = getDisplayedUnits(timer);
+    if (!units.length) {
+        return;
+    }
+
+    const first = timer.querySelector('.timer-wrapper .timerNum');
+    const forceTwoDigits = first !== null && first.querySelectorAll('.timerNumChar').length > 1;
+    let remaining = readRemaining(timer, units);
+
+    const handle = window.setInterval(() => {
+        remaining -= 1;
+        if (remaining <= 0) {
+            remaining = 0;
+            window.clearInterval(handle);
+        }
+
+        let left = remaining;
+        UNITS.forEach(([unit, size]) => {
+            if (units.indexOf(unit) === -1) {
+                return;
+            }
+            const count = Math.floor(left / size);
+            paintUnit(timer, unit, count, forceTwoDigits);
+            left -= count * size;
+        });
+    }, 1000);
+};
+
+/**
+ * Start every live timer on the page.
+ */
+export const init = () => {
+    document.querySelectorAll('.block_enrolmenttimer-timer.block_enrolmenttimer-live')
+        .forEach(startTimer);
+};

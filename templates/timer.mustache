@@ -1,0 +1,95 @@
+{{!
+    This file is part of Moodle - https://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+}}
+{{!
+    @template block_enrolmenttimer/timer
+
+    Countdown to the end of the viewer's enrolment.
+
+    Unit keys are machine names, never translated, so the JavaScript countdown
+    behaves the same in every language. Labels are supplied separately.
+
+    Context variables required for this template:
+    * live boolean - whether the JS countdown should animate this instance
+    * showlabels boolean - render the unit name under each figure
+    * showtext boolean - render the sentence form under the figures
+    * expirytext string - trailing sentence, already localised
+    * units array - list of units, largest first
+      * unit string - machine name, eg days
+      * label string - localised label matching the current count
+      * labelsingular string - localised singular label
+      * labelplural string - localised plural label
+      * count int - how many of this unit remain
+      * digits array - list of ['digit' => string, 'position' => int]
+      * last boolean - true for the final unit, suppresses the separator
+
+    Example context (json):
+    {
+        "live": true,
+        "showlabels": true,
+        "showtext": true,
+        "expirytext": "until your enrolment expires",
+        "units": [
+            {
+                "unit": "days",
+                "label": "days",
+                "labelsingular": "day",
+                "labelplural": "days",
+                "count": 12,
+                "digits": [{"digit": "1", "position": 0}, {"digit": "2", "position": 1}],
+                "last": false
+            },
+            {
+                "unit": "hours",
+                "label": "hours",
+                "labelsingular": "hour",
+                "labelplural": "hours",
+                "count": 6,
+                "digits": [{"digit": "0", "position": 0}, {"digit": "6", "position": 1}],
+                "last": true
+            }
+        ]
+    }
+}}
+<div class="block_enrolmenttimer-timer{{#live}} block_enrolmenttimer-live{{/live}}{{#showlabels}} block_enrolmenttimer-labelled{{/showlabels}}">
+    <hr>
+    <div class="visual-counter">
+        <div class="timer-wrapper">
+            {{#units}}
+                <div class="numberTypeWrapper">
+                    <div class="timerNum" data-unit="{{unit}}"
+                         data-label-singular="{{labelsingular}}" data-label-plural="{{labelplural}}">
+                        {{#digits}}
+                            <span class="timerNumChar" data-position="{{position}}">{{digit}}</span>
+                        {{/digits}}
+                    </div>
+                    {{#showlabels}}
+                        <p class="unit-label" data-unit="{{unit}}">{{label}}</p>
+                    {{/showlabels}}
+                </div>
+                {{^last}}<div class="seperator">:</div>{{/last}}
+            {{/units}}
+        </div>
+    </div>
+    <hr>
+    <div class="text-wrapper">
+        <p class="text-desc {{^showtext}}d-none{{/showtext}}">
+            {{#units}}<span class="unit-count" data-unit="{{unit}}">{{count}}</span>
+            <span class="unit-word" data-unit="{{unit}}">{{label}}</span> {{/units}}
+        </p>
+        <p class="sub-text">{{expirytext}}</p>
+    </div>
+</div>
