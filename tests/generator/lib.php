@@ -15,25 +15,14 @@
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
- * Define when the scheduled tasks run.
+ * Data generator for block_enrolmenttimer.
  *
  * @package    block_enrolmenttimer
+ * @category   test
  * @copyright  LearningWorks Ltd 2016
  * @copyright  2026 Dragonfly EdTech
  * @author     David Saylor <david.saylor@dragonflyedtech.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
-defined('MOODLE_INTERNAL') || die();
-
-$tasks = [
-    [
-        'classname' => 'block_enrolmenttimer\task\enrolmenttimer_task',
-        'blocking' => 0,
-        'minute' => '0',
-        'hour' => '2',
-        'day' => '*',
-        'dayofweek' => '*',
-        'month' => '*',
-    ],
-];
+class block_enrolmenttimer_generator extends testing_block_generator {
+}
