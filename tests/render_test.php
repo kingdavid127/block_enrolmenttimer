@@ -54,7 +54,7 @@ final class render_test extends \advanced_testcase {
         $this->setUser($user);
 
         $instance = $this->getDataGenerator()->create_block('enrolmenttimer', [
-            'parentcontextid' => \context_course::instance($course->id)->id,
+            'parentcontextid' => \core\context\course::instance($course->id)->id,
         ]);
 
         $PAGE->set_course($course);
@@ -234,7 +234,7 @@ final class render_test extends \advanced_testcase {
         $this->setUser($user);
 
         $instance = $this->getDataGenerator()->create_block('enrolmenttimer', [
-            'parentcontextid' => \context_course::instance($course->id)->id,
+            'parentcontextid' => \core\context\course::instance($course->id)->id,
         ]);
         $PAGE->set_course($course);
         $PAGE->set_url('/course/view.php', ['id' => $course->id]);
@@ -259,7 +259,7 @@ final class render_test extends \advanced_testcase {
         $this->setUser($user);
 
         $instance = $this->getDataGenerator()->create_block('enrolmenttimer', [
-            'parentcontextid' => \context_course::instance($course->id)->id,
+            'parentcontextid' => \core\context\course::instance($course->id)->id,
         ]);
         $PAGE->set_course($course);
         $PAGE->set_url('/course/view.php', ['id' => $course->id]);

@@ -16,8 +16,8 @@
 
 namespace block_enrolmenttimer\privacy;
 
-use context;
-use context_course;
+use core\context;
+use core\context\course as context_course;
 use core_privacy\local\metadata\collection;
 use core_privacy\local\request\approved_contextlist;
 use core_privacy\local\request\approved_userlist;

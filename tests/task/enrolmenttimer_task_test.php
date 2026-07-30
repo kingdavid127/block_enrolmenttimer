@@ -62,7 +62,7 @@ final class enrolmenttimer_task_test extends \advanced_testcase {
         $this->getDataGenerator()->enrol_user($user->id, $course->id, 'student', 'manual', 0, $timeend);
 
         $this->getDataGenerator()->create_block('enrolmenttimer', [
-            'parentcontextid' => \context_course::instance($course->id)->id,
+            'parentcontextid' => \core\context\course::instance($course->id)->id,
         ]);
 
         return [$course, $user];
@@ -154,7 +154,7 @@ final class enrolmenttimer_task_test extends \advanced_testcase {
         $user = $this->getDataGenerator()->create_user();
         $this->getDataGenerator()->enrol_user($user->id, $course->id, 'student');
         $this->getDataGenerator()->create_block('enrolmenttimer', [
-            'parentcontextid' => \context_course::instance($course->id)->id,
+            'parentcontextid' => \core\context\course::instance($course->id)->id,
         ]);
 
         ob_start();

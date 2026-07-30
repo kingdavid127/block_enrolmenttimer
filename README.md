@@ -1,21 +1,42 @@
 moodle-enrolmenttimer
 =====================
-[![Build Status](https://travis-ci.org/learningworks/moodle-block_enrolmenttimer.svg?branch=master)](https://travis-ci.org/learningworks/moodle-block_enrolmenttimer)
 
 Moodle Block - enrolmenttimer
 Developed by - Aaron Leggett - LearningWorks Ltd
-Maintained by - LearningWorks Ltd
+Maintained by - Dragonfly EdTech
 
 This block provides the functionality to display the time a user has left in their enrolment period.
 There are many settings to choose from to customise the way this is displayed to the user.
 A notification can be sent on a set period before the enrolment expires advising the user that their enrolment is coming to an end.
-Another email notification can be sent once the user has received a set score in the course_total score.
+Another email notification can be sent once a user completes the course.
 
 The plugin has been developed with limited styling to enable the best possible base for theme overrides to align the design with your existing moodle theme.
 
 
+REQUIREMENTS
+============
+- Moodle 5.1 (2025100600). MOODLE_501_STABLE is the branch CI builds against.
+- PHP 8.2, 8.3 or 8.4
+
+
 VERSION UPDATES
 ===============
+Version 2026073000
+- Target Moodle 5.1: `requires` raised to 2025100600 and `supported` declared
+- Use the namespaced core classes (`core\output\html_writer`, `core\user`,
+  `core\context\course`) rather than the legacy global aliases
+- Mark inherited block and task methods with `#[\Override]`
+- Tidy `db/access.php` and scope PHPUnit coverage to the code this plugin ships
+
+Version 2026072900
+- Replaced locallib.php with the autoloaded `block_enrolmenttimer\enrolment` class
+- Countdown markup moved to a Mustache template; units keyed by machine name so
+  the JS countdown no longer depends on the site language
+- All enrolment methods are considered, not just self enrolment
+- Real Privacy API provider in place of the previous null provider
+- Settings moved from the bare `enrolmenttimer` plugin name to `block_enrolmenttimer`
+- PHPUnit coverage added for the helper, block rendering, task and privacy provider
+
 Version 2019091800
 - Update JS to use AMD format
 - Implement Privacy API

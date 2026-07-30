@@ -25,6 +25,7 @@
  */
 
 use block_enrolmenttimer\enrolment;
+use core\output\html_writer;
 
 /**
  * Shows how long the viewer has left on their enrolment.
@@ -44,6 +45,8 @@ class block_enrolmenttimer extends block_base {
 
     /**
      * Initialise the block.
+     *
+     * Not marked #[\Override]: block_base calls init() but never declares it.
      */
     public function init(): void {
         $this->title = get_string('pluginname', 'block_enrolmenttimer');
@@ -54,6 +57,7 @@ class block_enrolmenttimer extends block_base {
      *
      * @return bool
      */
+    #[\Override]
     public function has_config(): bool {
         return true;
     }
@@ -63,6 +67,7 @@ class block_enrolmenttimer extends block_base {
      *
      * @return array
      */
+    #[\Override]
     public function applicable_formats(): array {
         return [
             'site-index' => false,
@@ -75,6 +80,7 @@ class block_enrolmenttimer extends block_base {
     /**
      * Pull the site level settings this instance needs.
      */
+    #[\Override]
     public function specialization(): void {
         $this->title = get_string('pluginname', 'block_enrolmenttimer');
         $this->activecountdown = (int) get_config('block_enrolmenttimer', 'activecountdown');
@@ -86,6 +92,7 @@ class block_enrolmenttimer extends block_base {
      *
      * @return stdClass
      */
+    #[\Override]
     public function get_content(): stdClass {
         global $USER;
 
