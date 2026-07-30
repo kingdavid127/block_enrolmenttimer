@@ -101,7 +101,7 @@ final class provider_test extends \core_privacy\tests\provider_testcase {
         $contexts = $contextlist->get_contextids();
 
         $this->assertCount(1, $contexts);
-        $this->assertSame(\context_course::instance($course->id)->id, (int) $contexts[0]);
+        $this->assertSame(\core\context\course::instance($course->id)->id, (int) $contexts[0]);
 
         // The other user is in a different course, so must not appear here.
         $othercontexts = provider::get_contexts_for_userid($otheruser->id);
@@ -125,7 +125,7 @@ final class provider_test extends \core_privacy\tests\provider_testcase {
         $this->resetAfterTest();
 
         [$course, $user] = $this->setup_alert();
-        $context = \context_course::instance($course->id);
+        $context = \core\context\course::instance($course->id);
 
         $userlist = new userlist($context, 'block_enrolmenttimer');
         provider::get_users_in_context($userlist);
@@ -140,7 +140,7 @@ final class provider_test extends \core_privacy\tests\provider_testcase {
         $this->resetAfterTest();
         $this->setup_alert();
 
-        $userlist = new userlist(\context_system::instance(), 'block_enrolmenttimer');
+        $userlist = new userlist(\core\context\system::instance(), 'block_enrolmenttimer');
         provider::get_users_in_context($userlist);
 
         $this->assertCount(0, $userlist->get_userids());
@@ -153,7 +153,7 @@ final class provider_test extends \core_privacy\tests\provider_testcase {
         $this->resetAfterTest();
 
         [$course, $user] = $this->setup_alert();
-        $context = \context_course::instance($course->id);
+        $context = \core\context\course::instance($course->id);
 
         $this->export_context_data_for_user($user->id, $context, 'block_enrolmenttimer');
 
@@ -178,7 +178,7 @@ final class provider_test extends \core_privacy\tests\provider_testcase {
         $this->setup_alert();
         $this->assertSame(2, $DB->count_records('block_enrolmenttimer'));
 
-        provider::delete_data_for_all_users_in_context(\context_course::instance($course->id));
+        provider::delete_data_for_all_users_in_context(\core\context\course::instance($course->id));
 
         $this->assertSame(1, $DB->count_records('block_enrolmenttimer'));
     }
@@ -206,9 +206,9 @@ final class provider_test extends \core_privacy\tests\provider_testcase {
 
         $this->assertSame(2, $DB->count_records('block_enrolmenttimer'));
 
-        $context = \context_course::instance($course->id);
+        $context = \core\context\course::instance($course->id);
         provider::delete_data_for_user(new approved_contextlist(
-            \core_user::get_user($user->id),
+            \core\user::get_user($user->id),
             'block_enrolmenttimer',
             [$context->id]
         ));
@@ -240,7 +240,7 @@ final class provider_test extends \core_privacy\tests\provider_testcase {
         );
         $this->queue_alert($course->id, $mate->id);
 
-        $context = \context_course::instance($course->id);
+        $context = \core\context\course::instance($course->id);
         provider::delete_data_for_users(new approved_userlist(
             $context,
             'block_enrolmenttimer',

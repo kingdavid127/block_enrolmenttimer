@@ -19,10 +19,14 @@
  *
  * @package    block_enrolmenttimer
  * @copyright  LearningWorks Ltd 2016
+ * @copyright  2026 Dragonfly EdTech
+ * @author     David Saylor <david.saylor@dragonflyedtech.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-defined('MOODLE_INTERNAL') || die;
-    $capabilities = [
+
+defined('MOODLE_INTERNAL') || die();
+
+$capabilities = [
     'block/enrolmenttimer:addinstance' => [
         'riskbitmask' => RISK_SPAM | RISK_XSS,
         'captype' => 'write',
@@ -33,4 +37,4 @@ defined('MOODLE_INTERNAL') || die;
         ],
         'clonepermissionsfrom' => 'moodle/site:manageblocks',
     ],
-    ];
+];

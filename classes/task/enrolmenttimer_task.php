@@ -16,9 +16,9 @@
 
 namespace block_enrolmenttimer\task;
 
-use context_course;
+use core\context\course as context_course;
 use core\task\scheduled_task;
-use core_user;
+use core\user;
 use stdClass;
 
 /**
@@ -44,6 +44,7 @@ class enrolmenttimer_task extends scheduled_task {
      *
      * @return string
      */
+    #[\Override]
     public function get_name() {
         return get_string('pluginname', 'block_enrolmenttimer');
     }
@@ -51,6 +52,7 @@ class enrolmenttimer_task extends scheduled_task {
     /**
      * Run the task.
      */
+    #[\Override]
     public function execute() {
         $sendalerts = (bool) get_config('block_enrolmenttimer', 'timeleftmessagechk');
         $sendcompletions = (bool) get_config('block_enrolmenttimer', 'completionsmessagechk');
@@ -296,7 +298,7 @@ class enrolmenttimer_task extends scheduled_task {
 
         return (bool) email_to_user(
             $user,
-            core_user::get_support_user(),
+            user::get_support_user(),
             $subject,
             html_to_text($html),
             $html
@@ -310,7 +312,7 @@ class enrolmenttimer_task extends scheduled_task {
      * @return stdClass|null
      */
     private function get_user(int $userid): ?stdClass {
-        $user = core_user::get_user($userid, '*', IGNORE_MISSING);
+        $user = user::get_user($userid, '*', IGNORE_MISSING);
         if (!$user || $user->deleted || $user->suspended) {
             return null;
         }
